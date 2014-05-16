@@ -31,7 +31,7 @@ module FFI
             parser.load_config(config_fn)
           end
           File.open(output_fn, 'w') do |file|
-            file << parser.generate(Nokogiri::XML(File.open(xml_fn)))
+            file << parser.generate(Nokogiri::XML(File.open(xml_fn)) do |cfg| cfg.noblanks end)
           end
         end
       end
