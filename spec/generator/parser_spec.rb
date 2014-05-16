@@ -40,7 +40,7 @@ describe Generator::Parser do
     end
 
     it 'should generate ruby ffi wrap code' do
-      Generator::Parser.new.generate(@node).should == <<EOC
+      Generator::Parser.new.generate(@node).should == (_tmp1 = <<EOC)
 
 module TestLib
   extend FFI::Library
@@ -92,7 +92,7 @@ module TestLib
            :s_3, TestStruct3.by_value,
            :e, :enum_t,
            :func, Callback_cb,
-           :u, UnionT,
+           :u, UnionT.by_value,
            :callback, Callback_cb,
            :inline_callback, callback([ Callback_cb_2 ], :void)
     )
@@ -172,7 +172,7 @@ module TestLib
 #            :nested_struct_field_1, TestStruct5BigUnionFieldNestedStructField1.by_value,
 #            :nested_struct_field_2, TestStruct5BigUnionFieldNestedStructField2.by_value,
 #            :nested_struct_field_3, TestStruct5BigUnionFieldNestedStructField3.by_value,
-#            :union_field, TestStruct5BigUnionFieldUnionField
+#            :union_field, TestStruct5BigUnionFieldUnionField.by_value
 #     )
 #   end
 # FIXME: Nested structures are not correctly supported at the moment.
@@ -181,7 +181,7 @@ module TestLib
 #     layout(
 #            :i, :int,
 #            :c, :char,
-#            :big_union_field, TestStruct5BigUnionField
+#            :big_union_field, TestStruct5BigUnionField.by_value
 #     )
 #   end
   attach_function :get_int, :get_int, [ TestStruct.ptr ], :int
@@ -197,11 +197,11 @@ EOC
       parser = Generator::Parser.new    
       parser.ignore 'CONST_1', 'e_1', 'test_struct', 'test_struct_5'
       parser.ignore(/^func_with_enum/)
-      parser.generate(@node).should == <<EOC
+      parser.generate(@node).should == (_tmp1 = <<EOC)
 
 module TestLib
   extend FFI::Library
-  class TestStruct < FFI::Struct; end
+  class TestStruct3 < FFI::Struct; end
   CONST_2 = 0x20
   typedef :uchar, :byte
   class UnionT < FFI::Union
@@ -232,7 +232,7 @@ module TestLib
            :s_3, TestStruct3.by_value,
            :e, :enum_t,
            :func, Callback_cb,
-           :u, UnionT,
+           :u, UnionT.by_value,
            :callback, Callback_cb,
            :inline_callback, callback([ Callback_cb_2 ], :void)
     )
