@@ -68,7 +68,7 @@ EOM
         # struct.  In that case the typedef code would output something that
         # throws an error.  See issue #21
         # return false if get_attr(node, 'type') =~ /^struct |^union /
-        typedef?(node) and !callback?(node) and !get_attr(node, 'sym_name').nil?
+        typedef?(node) and !callback?(node) and (!get_attr(node, 'sym_name').nil? or !get_attr(node, 'name').nil?)
       end
       def callback?(node)
         get_attr(node, 'decl') =~ /^p\.f\(/
