@@ -35,7 +35,7 @@ describe Generator::Typedef do
   end
 
   it 'does not generate typedef lines for opaque structs' do
-    @parser.generate((@node / 'cdecl')[4]).should == ""
+    @parser.generate((@node / 'cdecl')[4]).should == "\n"
   end
 
   it 'can generate pointer typedefs' do
