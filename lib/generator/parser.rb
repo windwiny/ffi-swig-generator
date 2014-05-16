@@ -67,7 +67,7 @@ EOM
         # This is to handle the case where a typedef references an opaque
         # struct.  In that case the typedef code would output something that
         # throws an error.  See issue #21
-        return false if get_attr(node, 'type') =~ /^struct /
+        # return false if get_attr(node, 'type') =~ /^struct |^union /
         typedef?(node) and !callback?(node) and !get_attr(node, 'sym_name').nil?
       end
       def callback?(node)

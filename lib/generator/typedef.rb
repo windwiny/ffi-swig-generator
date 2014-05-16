@@ -11,7 +11,11 @@ module FFI
       def to_s
         symm = @type.to_s
         if /\.by_value$/ =~ symm
-          @indent_str + "#{Struct.camelcase(@name)} = #{symm[0...-9]}"
+          if Struct.camelcase(@name) != symm[0...-9]
+            @indent_str + "#{Struct.camelcase(@name)} = #{symm[0...-9]}"
+          else
+            ""
+          end
         else
           @indent_str + "typedef #{symm}, :#{@name}"
         end
