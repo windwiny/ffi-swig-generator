@@ -16,12 +16,17 @@ RSpec::configure do |config|
 end
 
 def generate_xml_wrap_from(fn)
-  `swig -xml spec/generator/swig/#{fn + '.i'}`
-  Nokogiri::XML(File.open(File.join('spec/generator/swig/', "#{fn}_wrap.xml")))
+  pwd = File.expand_path '..', __FILE__
+  f_inp = "#{pwd}/generator/swig/#{fn}.i"
+  f_xml = "#{pwd}/generator/swig/#{fn}_wrap.xml"
+  if !File.exist?(f_xml) || File.mtime(f_xml) < File.mtime(f_inp)
+    `swig -xml #{f_inp}` rescue exit(2)
+  end
+  Nokogiri::XML(File.open(f_xml))
 end
 
 def remove_xml
-  FileUtils.rm(Dir.glob('spec/generator/swig/*.xml'))
+  FileUtils.rm(Dir.glob(File.expand_path '../generator/swig/*.xml', __FILE__))
 end
 
 share_examples_for "All specs" do
