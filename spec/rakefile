@@ -8,7 +8,7 @@ task :test do
   fs = Dir.glob(File.expand_path '../generator/*.rb', __FILE__)
   fs.each do |fn|
     puts "******** #{fn} ********"
-    system "rspec #{fn}"
+    system "rspec -c #{fn}"
   end
 end
 

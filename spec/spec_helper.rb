@@ -20,7 +20,7 @@ def generate_xml_wrap_from(fn)
   f_inp = "#{pwd}/generator/swig/#{fn}.i"
   f_xml = "#{pwd}/generator/swig/#{fn}_wrap.xml"
   if !File.exist?(f_xml) || File.mtime(f_xml) < File.mtime(f_inp)
-    `swig -xml #{f_inp}` rescue exit(2)
+    `swig -xml #{f_inp}`
   end
   Nokogiri::XML(File.open(f_xml))
 end
