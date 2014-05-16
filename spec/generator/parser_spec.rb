@@ -298,10 +298,6 @@ EOC
     end
 
     it 'should not use pointers to opaque structs' do
-      m = Module.new
-      m.module_exec do
-        extend FFI::Library
-      end
       xml = generate_xml_wrap_from('parser_opaque_struct')
       buf = Generator::Parser.new.generate(xml)
       buf.include?("OpaqueStruct.ptr").should == false
