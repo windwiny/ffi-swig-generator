@@ -155,7 +155,7 @@ EOM
                 add_type(typedef.symname, "callback #{typedef.symname}")
                 node_result << cb.to_s
               elsif typedef_alias?(node)
-                node_result << typedef.to_s << "\n"
+                node_result << typedef.to_s << "\n" if typedef.to_s != ""
               end
             elsif enum?(node)
               node_type = :enum
