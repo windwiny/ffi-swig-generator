@@ -57,6 +57,7 @@ module TestLib
     :'3',
   ]
 
+  typedef e_1, :enum_t
   class UnionT < FFI::Union
     layout(
            :c, :char,
@@ -204,6 +205,7 @@ module TestLib
   class TestStruct3 < FFI::Struct; end
   CONST_2 = 0x20
   typedef :uchar, :byte
+  typedef :int, :enum_t
   class UnionT < FFI::Union
     layout(
            :c, :char,
