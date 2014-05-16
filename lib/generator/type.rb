@@ -87,6 +87,8 @@ module FFI
         decl = Declaration.new(tail_decl)
         return Struct.camelcase(tail_decl.split(" ").last) + ".ptr" if
           decl.is_struct?
+        return Struct.camelcase(tail_decl.split(" ").last) + ".ptr" if
+          decl.is_union?
 
         # Everything else is a :pointer
         ":pointer"
@@ -102,7 +104,8 @@ module FFI
         Struct.camelcase(@full_decl.scan(/^struct\s(\w+)/).flatten[0]) + ".by_value"
       end
       def union
-        Union.camelcase(@full_decl.scan(/^union\s(\w+)/).flatten[0]) if @declaration.is_union?
+        return nil unless @declaration.is_union?
+        Union.camelcase(@full_decl.scan(/^union\s(\w+)/).flatten[0]) + ".by_value"
       end
       def enum
         return nil unless @declaration.is_enum?
