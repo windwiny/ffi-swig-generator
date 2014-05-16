@@ -252,8 +252,8 @@ EOM
           # generated code segment.  If the layout of the struct is never
           # supplied, we convert all Struct.ptr references to :pointer.
           generated.scan(/([a-z0-9]+)\.ptr/i).uniq.flatten.each do |klass|
-            if result.find { |t,b| b =~ /^  class #{klass}/ }
-              buf << "#{" " * @indent}class #{klass} < FFI::Struct; end\n"
+            if result.find { |t,b| b =~ /^  (class #{klass}.*)/ }
+              buf << "#{" " * @indent}#{$1}; end\n"
             else
               generated.gsub! /([^a-zA-Z0-9])#{klass}.ptr/, "\\1:pointer"
             end
