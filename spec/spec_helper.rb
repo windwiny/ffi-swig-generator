@@ -22,7 +22,7 @@ def generate_xml_wrap_from(fn)
   if !File.exist?(f_xml) || File.mtime(f_xml) < File.mtime(f_inp)
     `swig -xml #{f_inp}`
   end
-  Nokogiri::XML(File.open(f_xml))
+  Nokogiri::XML(File.open(f_xml)) do |cfg| cfg.noblanks end
 end
 
 def remove_xml
