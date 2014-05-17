@@ -40,6 +40,49 @@ describe Generator::Parser do
     end
 
     it 'should generate ruby ffi wrap code' do
+      nested_class = if @node./("//class/attributelist/attribute[@name='nested'][@value='1']").empty?
+        <<-EOC
+# FIXME: Nested structures are not correctly supported at the moment.
+# Please check the order of the declarations in the structure below.
+#   class TestStruct5BigUnionField < FFI::Union
+#     layout(
+#            :f, :float,
+#            :nested_struct_field_1, TestStruct5BigUnionFieldNestedStructField1.by_value,
+#            :nested_struct_field_2, TestStruct5BigUnionFieldNestedStructField2.by_value,
+#            :nested_struct_field_3, TestStruct5BigUnionFieldNestedStructField3.by_value,
+#            :union_field, TestStruct5BigUnionFieldUnionField.by_value
+#     )
+#   end
+# FIXME: Nested structures are not correctly supported at the moment.
+# Please check the order of the declarations in the structure below.
+#   class TestStruct5 < FFI::Struct
+#     layout(
+#            :i, :int,
+#            :c, :char,
+#            :big_union_field, TestStruct5BigUnionField.by_value
+#     )
+#   end
+EOC
+      else
+        <<-EOC
+  class TestStruct5BigUnionField < FFI::Union
+    layout(
+           :nested_struct_field_1, TestStruct5BigUnionFieldNestedStructField1.by_value,
+           :nested_struct_field_2, TestStruct5BigUnionFieldNestedStructField2.by_value,
+           :nested_struct_field_3, TestStruct5BigUnionFieldNestedStructField3.by_value,
+           :union_field, TestStruct5BigUnionFieldUnionField.by_value,
+           :f, :float
+    )
+  end
+  class TestStruct5 < FFI::Struct
+    layout(
+           :i, :int,
+           :big_union_field, TestStruct5BigUnionField.by_value,
+           :c, :char
+    )
+  end
+EOC
+      end
       Generator::Parser.new.generate(@node).should == (_tmp1 = <<EOC)
 
 module TestLib
@@ -165,26 +208,7 @@ module TestLib
            :ll, :long_long
     )
   end
-# FIXME: Nested structures are not correctly supported at the moment.
-# Please check the order of the declarations in the structure below.
-#   class TestStruct5BigUnionField < FFI::Union
-#     layout(
-#            :f, :float,
-#            :nested_struct_field_1, TestStruct5BigUnionFieldNestedStructField1.by_value,
-#            :nested_struct_field_2, TestStruct5BigUnionFieldNestedStructField2.by_value,
-#            :nested_struct_field_3, TestStruct5BigUnionFieldNestedStructField3.by_value,
-#            :union_field, TestStruct5BigUnionFieldUnionField.by_value
-#     )
-#   end
-# FIXME: Nested structures are not correctly supported at the moment.
-# Please check the order of the declarations in the structure below.
-#   class TestStruct5 < FFI::Struct
-#     layout(
-#            :i, :int,
-#            :c, :char,
-#            :big_union_field, TestStruct5BigUnionField.by_value
-#     )
-#   end
+#{nested_class.chomp}
   attach_function :get_int, :get_int, [ TestStruct.ptr ], :int
   attach_function :get_char, :get_char, [ TestStruct.ptr ], :char
   attach_function :func_with_enum, :func_with_enum, [ e_1 ], :int
