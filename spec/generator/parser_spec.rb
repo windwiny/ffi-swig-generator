@@ -40,7 +40,7 @@ describe Generator::Parser do
     end
 
     it 'should generate ruby ffi wrap code' do
-      Generator::Parser.new.generate(@node).should == <<EOC
+      Generator::Parser.new.generate(@node).should == (_tmp1 = <<EOC)
 
 module TestLib
   extend FFI::Library
@@ -197,7 +197,7 @@ EOC
       parser = Generator::Parser.new    
       parser.ignore 'CONST_1', 'e_1', 'test_struct', 'test_struct_5'
       parser.ignore(/^func_with_enum/)
-      parser.generate(@node).should == <<EOC
+      parser.generate(@node).should == (_tmp1 = <<EOC)
 
 module TestLib
   extend FFI::Library
@@ -298,10 +298,6 @@ EOC
     end
 
     it 'should not use pointers to opaque structs' do
-      m = Module.new
-      m.module_exec do
-        extend FFI::Library
-      end
       xml = generate_xml_wrap_from('parser_opaque_struct')
       buf = Generator::Parser.new.generate(xml)
       buf.include?("OpaqueStruct.ptr").should == false

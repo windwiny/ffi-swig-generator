@@ -1,0 +1,20 @@
+
+desc "default => test"
+task :default => :test
+
+
+desc "test all spec file"
+task :test do
+  fs = Dir.glob(File.expand_path '../generator/*.rb', __FILE__)
+  fs.each do |fn|
+    puts "******** #{fn} ********"
+    system "rspec -c #{fn}"
+  end
+end
+
+
+desc "rm *.xml"
+task :clean do
+  fs = Dir.glob(File.expand_path '../generator/swig/*.xml', __FILE__)
+  FileUtils.rm(fs)
+end
