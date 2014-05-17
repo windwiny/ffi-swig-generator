@@ -104,7 +104,7 @@ EOC
       .should == (_tmp1 = <<EOC)
 class TestStruct8 < FFI::Struct
   layout(
-         :data, TestStruct8Data
+         :data, TestStruct8Data.by_value
   )
 end
 EOC
