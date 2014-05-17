@@ -12,6 +12,7 @@ EOM
         @nested_structure = {}
         @ignored = []
         @ignore_at_second_pass = []
+        @swig30_xml = false
       end
       def generate(node)
         result = ""
@@ -99,6 +100,8 @@ EOM
         result << fix_nested_structure(nested_node) if nested_node
       end
       def fixme(code, message)
+        # in swig-3.0 generated xml file, the order of the declarations in the structure|union is correctly.
+        return code if @swig30_xml
         comment('FIXME: ' + message) << comment(code)
       end
       def comment(code)
@@ -130,6 +133,20 @@ EOM
         end
       end
       def pass(node)
+        # in swig-3.0 generated xml file, the nested indicate format is changed.
+        #  first pass find all nested_type.
+        # FIXME: hard-code xpath
+        if @nested_type.empty? && !node./("//class/attributelist/attribute[@name='nested'][@value='1']").empty?
+          @swig30_xml = true
+          node.xpath("//class/attributelist/attribute[@name='kind'][@value='struct']",
+                     "//class/attributelist/attribute[@name='kind'][@value='union']").each do |node2|
+            node2 = node2.parent.parent rescue next
+            next if node2./("./attributelist/attribute[@name='nested'][@value='1']").empty?
+            type = get_attr(node2, 'name').split(".").last
+            node2 = node.xpath("//class/cdecl/attributelist/attribute[@name='type'][@value='#{type}']")
+            @nested_type[type] = get_attr(node2[0].parent.parent.parent, 'name') if node2[0]
+          end
+        end
         result = []
         node.traverse do |node|
           node_result = ''
@@ -191,7 +208,7 @@ EOM
             elsif node.name == 'insert' and not insert_runtime?(node) and not node.parent.name == 'class'
               node_type = :insert
               node_result << get_verbatim(node)
-            end       
+            end
           end
 
           # don't append unhandled node types
