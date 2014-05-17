@@ -67,8 +67,8 @@ EOM
         # This is to handle the case where a typedef references an opaque
         # struct.  In that case the typedef code would output something that
         # throws an error.  See issue #21
-        return false if get_attr(node, 'type') =~ /^struct /
-        typedef?(node) and !callback?(node) and !get_attr(node, 'sym_name').nil?
+        # return false if get_attr(node, 'type') =~ /^struct |^union /
+        typedef?(node) and !callback?(node) and (!get_attr(node, 'sym_name').nil? or !get_attr(node, 'name').nil?)
       end
       def callback?(node)
         get_attr(node, 'decl') =~ /^p\.f\(/
@@ -141,13 +141,21 @@ EOM
             elsif typedef?(node)
               node_type = :typedef
               typedef = Typedef.new(:node => node, :indent => @indent, :typedefs => @typedefs)
-              add_type(typedef.symname, ":#{typedef.symname}")
+              if /^struct |^union / =~ typedef.type.full_decl
+                add_type(typedef.symname, "#{typedef.type.full_decl}")
+              else
+                if /^struct |^union / =~ @typedefs[typedef.type.full_decl]
+                  add_type(typedef.symname, @typedefs[typedef.type.full_decl])
+                else
+                  add_type(typedef.symname, ":#{typedef.symname}")
+                end
+              end
               if callback?(node)
                 cb = Callback.new(:node => node, :indent => @indent, :typedefs => @typedefs).to_s << "\n"
                 add_type(typedef.symname, "callback #{typedef.symname}")
                 node_result << cb.to_s
               elsif typedef_alias?(node)
-                node_result << typedef.to_s << "\n"
+                node_result << typedef.to_s << "\n" if typedef.to_s != ""
               end
             elsif enum?(node)
               node_type = :enum
@@ -183,7 +191,7 @@ EOM
             elsif node.name == 'insert' and not insert_runtime?(node) and not node.parent.name == 'class'
               node_type = :insert
               node_result << get_verbatim(node)
-            end       
+            end
           end
 
           # don't append unhandled node types
@@ -252,8 +260,8 @@ EOM
           # generated code segment.  If the layout of the struct is never
           # supplied, we convert all Struct.ptr references to :pointer.
           generated.scan(/([a-z0-9]+)\.ptr/i).uniq.flatten.each do |klass|
-            if result.find { |t,b| b =~ /^  class #{klass}/ }
-              buf << "#{" " * @indent}class #{klass} < FFI::Struct; end\n"
+            if result.find { |t,b| b =~ /^  (class #{klass}.*)/ }
+              buf << "#{" " * @indent}#{$1}; end\n"
             else
               generated.gsub! /([^a-zA-Z0-9])#{klass}.ptr/, "\\1:pointer"
             end
